@@ -41,6 +41,7 @@ import { onMoveEvent } from '@/utils/testCaseMoveEvent';
 
 type Props = {
   projectId: string;
+  folderId: string;
   isDisabled: boolean;
   cases: CaseType[];
   onCreateCase: () => void;
@@ -61,6 +62,7 @@ type Props = {
 
 export default function TestCaseTable({
   projectId,
+  folderId,
   isDisabled,
   cases,
   onCreateCase,
@@ -97,20 +99,35 @@ export default function TestCaseTable({
 
       switch (columnKey) {
         case 'id':
-          return <span>{cellValue as number}</span>;
+          return <span>TC-{cellValue as number}</span>;
         case 'title':
+          const currentFolderId = Number(folderId);
+          const isInDifferentFolder = testCase.folderId !== currentFolderId;
           return (
-            <Link
-              href={`/projects/${projectId}/folders/${testCase.folderId}/cases/${testCase.id}`}
-              locale={locale}
-              className={NextUiLinkClasses}
-              draggable="false"
-            >
-              {highlightSearchTerm({
-                text: cellValue as string,
-                searchTerm: activeSearchFilter,
-              })}
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/projects/${projectId}/folders/${testCase.folderId}/cases/${testCase.id}`}
+                locale={locale}
+                className={NextUiLinkClasses}
+                draggable="false"
+              >
+                {highlightSearchTerm({
+                  text: cellValue as string,
+                  searchTerm: activeSearchFilter,
+                })}
+              </Link>
+              {isInDifferentFolder && testCase.Folder && (
+                <Link
+                  href={`/projects/${projectId}/folders/${testCase.folderId}/cases`}
+                  locale={locale}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Chip size="sm" variant="flat" className="text-xs cursor-pointer hover:opacity-80">
+                    {testCase.Folder.name}
+                  </Chip>
+                </Link>
+              )}
+            </div>
           );
         case 'priority':
           return <TestCasePriority priorityValue={cellValue as number} priorityMessages={priorityMessages} />;
