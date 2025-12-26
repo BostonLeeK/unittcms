@@ -4,6 +4,8 @@ import defineProject from '../models/projects.js';
 import defineFolder from '../models/folders.js';
 import defineCase from '../models/cases.js';
 import defineRun from '../models/runs.js';
+import defineDocumentFolder from '../models/documentFolders.js';
+import defineDocument from '../models/documents.js';
 
 export default function verifyVisibleMiddleware(sequelize) {
   /**
@@ -153,10 +155,70 @@ export default function verifyVisibleMiddleware(sequelize) {
     return false;
   }
 
+  async function verifyProjectVisibleFromDocumentFolderId(req, res, next) {
+    const DocumentFolder = defineDocumentFolder(sequelize, DataTypes);
+
+    const folderId = req.params.folderId || req.query.folderId;
+    if (!folderId) {
+      return res.status(400).json({ error: 'folderId is required' });
+    }
+
+    const folder = await DocumentFolder.findByPk(folderId);
+    const projectId = folder && folder.projectId;
+    if (!projectId) {
+      return res.status(404).send('failed to find projectId');
+    }
+
+    const isVisble = await isVisible(projectId, req.userId);
+    if (isVisble) {
+      next();
+      return;
+    }
+
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
+  async function verifyProjectVisibleFromDocumentId(req, res, next) {
+    const Project = defineProject(sequelize, DataTypes);
+    const DocumentFolder = defineDocumentFolder(sequelize, DataTypes);
+    const Document = defineDocument(sequelize, DataTypes);
+    Project.hasMany(DocumentFolder, { foreignKey: 'projectId' });
+    DocumentFolder.hasMany(Document, { foreignKey: 'folderId' });
+    DocumentFolder.belongsTo(Project, { foreignKey: 'projectId' });
+    Document.belongsTo(DocumentFolder, { foreignKey: 'folderId' });
+
+    const documentId = req.params.documentId || req.query.documentId;
+    if (!documentId) {
+      return res.status(400).json({ error: 'documentId is required' });
+    }
+
+    const document = await Document.findByPk(documentId, {
+      include: {
+        model: DocumentFolder,
+        include: Project,
+      },
+    });
+
+    const projectId = document && document.DocumentFolder && document.DocumentFolder.Project && document.DocumentFolder.Project.id;
+    if (!projectId) {
+      return res.status(404).send('failed to find projectId');
+    }
+
+    const isVisble = await isVisible(projectId, req.userId);
+    if (isVisble) {
+      next();
+      return;
+    }
+
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
   return {
     verifyProjectVisibleFromProjectId,
     verifyProjectVisibleFromFolderId,
     verifyProjectVisibleFromCaseId,
     verifyProjectVisibleFromRunId,
+    verifyProjectVisibleFromDocumentFolderId,
+    verifyProjectVisibleFromDocumentId,
   };
 }

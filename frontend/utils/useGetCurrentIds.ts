@@ -22,9 +22,11 @@ const useGetCurrentIds = (): ProjectFolderIds => {
 
     const projectIdIndex = pathSegments.indexOf('projects') + 1;
     const folderIdIndex = pathSegments.indexOf('folders') + 1;
+    const documentFolderIdIndex = pathSegments.indexOf('documentFolders') + 1;
 
     const newProjectId = projectIdIndex !== -1 ? parseInt(pathSegments[projectIdIndex], 10) : null;
-    const newFolderId = folderIdIndex !== -1 ? parseInt(pathSegments[folderIdIndex], 10) : null;
+    const newFolderId = folderIdIndex !== -1 ? parseInt(pathSegments[folderIdIndex], 10) : 
+                        documentFolderIdIndex !== -1 ? parseInt(pathSegments[documentFolderIdIndex], 10) : null;
 
     setProjectId(newProjectId);
     setFolderId(newFolderId);
