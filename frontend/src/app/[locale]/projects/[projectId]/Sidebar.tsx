@@ -9,6 +9,8 @@ import {
   FlaskConical,
   UserRound,
   Settings,
+  FileText,
+  Wrench,
 } from 'lucide-react';
 import { usePathname, useRouter } from '@/src/i18n/routing';
 import useGetCurrentIds from '@/utils/useGetCurrentIds';
@@ -39,6 +41,10 @@ export default function Sidebar({ messages, locale }: Props) {
       router.push(`/projects/${projectId}/folders`, { locale: locale });
     } else if (key === 'runs') {
       router.push(`/projects/${projectId}/runs`, { locale: locale });
+    } else if (key === 'documents') {
+      router.push(`/projects/${projectId}/documentFolders`, { locale: locale });
+    } else if (key === 'tools') {
+      router.push(`/projects/${projectId}/tools/xml-viewer`, { locale: locale });
     } else if (key === 'members') {
       router.push(`/projects/${projectId}/members`, { locale: locale });
     } else if (key === 'settings') {
@@ -50,10 +56,14 @@ export default function Sidebar({ messages, locale }: Props) {
     const handleRouteChange = (currentPath: string) => {
       if (currentPath.includes('home')) {
         setCurrentKey('home');
-      } else if (currentPath.includes('folders')) {
+      } else if (currentPath.includes('folders') && !currentPath.includes('documentFolders')) {
         setCurrentKey('cases');
       } else if (currentPath.includes('runs')) {
         setCurrentKey('runs');
+      } else if (currentPath.includes('documentFolders') || currentPath.includes('documents')) {
+        setCurrentKey('documents');
+      } else if (currentPath.includes('tools')) {
+        setCurrentKey('tools');
       } else if (currentPath.includes('members')) {
         setCurrentKey('members');
       } else if (currentPath.includes('settings')) {
@@ -79,6 +89,16 @@ export default function Sidebar({ messages, locale }: Props) {
       key: 'runs',
       text: messages.testRuns,
       startContent: <FlaskConical strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />,
+    },
+    {
+      key: 'documents',
+      text: messages.documents,
+      startContent: <FileText strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />,
+    },
+    {
+      key: 'tools',
+      text: messages.tools,
+      startContent: <Wrench strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />,
     },
     {
       key: 'members',

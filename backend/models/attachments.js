@@ -18,6 +18,9 @@ function defineAttachment(sequelize, DataTypes) {
     Attachment.belongsToMany(models.Case, {
       through: 'caseAttachments',
     });
+    Attachment.belongsToMany(models.Document, {
+      through: 'documentAttachments',
+    });
   };
 
   return Attachment;

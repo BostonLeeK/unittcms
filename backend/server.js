@@ -92,6 +92,16 @@ app.use('/folders', foldersEditRoute(sequelize));
 app.use('/folders', foldersDeleteRoute(sequelize));
 app.use('/folders', foldersCloneRoute(sequelize));
 
+// "/documentFolders"
+import documentFoldersIndexRoute from './routes/documentFolders/index.js';
+import documentFoldersNewRoute from './routes/documentFolders/new.js';
+import documentFoldersEditRoute from './routes/documentFolders/edit.js';
+import documentFoldersDeleteRoute from './routes/documentFolders/delete.js';
+app.use('/documentFolders', documentFoldersIndexRoute(sequelize));
+app.use('/documentFolders', documentFoldersNewRoute(sequelize));
+app.use('/documentFolders', documentFoldersEditRoute(sequelize));
+app.use('/documentFolders', documentFoldersDeleteRoute(sequelize));
+
 // "/cases"
 import casesDownloadRoute from './routes/cases/download.js';
 import casesMoveRoute from './routes/cases/move.js';
@@ -113,6 +123,20 @@ app.use('/cases', casesEditRoute(sequelize));
 app.use('/cases', casesDeleteRoute(sequelize));
 app.use('/cases', casesCloneRoute(sequelize));
 app.use('/cases', casesImportRoute(sequelize));
+
+// "/documents"
+import documentsIndexRoute from './routes/documents/index.js';
+import documentsIndexByProjectIdRoute from './routes/documents/indexByProjectId.js';
+import documentsShowRoute from './routes/documents/show.js';
+import documentsNewRoute from './routes/documents/new.js';
+import documentsEditRoute from './routes/documents/edit.js';
+import documentsDeleteRoute from './routes/documents/delete.js';
+app.use('/documents', documentsIndexRoute(sequelize));
+app.use('/documents', documentsIndexByProjectIdRoute(sequelize));
+app.use('/documents', documentsShowRoute(sequelize));
+app.use('/documents', documentsNewRoute(sequelize));
+app.use('/documents', documentsEditRoute(sequelize));
+app.use('/documents', documentsDeleteRoute(sequelize));
 
 // "/steps"
 import stepsEditRoute from './routes/steps/edit.js';

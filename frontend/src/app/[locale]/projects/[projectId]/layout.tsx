@@ -15,6 +15,8 @@ export default function SidebarLayout({
     home: t('home'),
     testCases: t('test_cases'),
     testRuns: t('test_runs'),
+    documents: t('documents'),
+    tools: t('tools'),
     members: t('members'),
     settings: t('settings'),
   };
