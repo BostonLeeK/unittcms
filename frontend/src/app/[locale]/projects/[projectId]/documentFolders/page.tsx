@@ -29,6 +29,7 @@ export default function Page({ params }: { params: { projectId: string; locale: 
     maxFileSize: tDocuments('max_file_size'),
     noDocumentsFound: tDocuments('no_documents_found'),
     search: tDocuments('search'),
+    actions: tDocuments('actions'),
     backToDocuments: tDocuments('back_to_documents'),
     updating: tDocuments('updating'),
     updatedDocument: tDocuments('updated_document'),

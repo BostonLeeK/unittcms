@@ -14,7 +14,7 @@ type Props = {
   onAttachmentDownload: (attachmentId: number, downloadFileName: string) => void;
   onAttachmentDelete: (attachmentId: number) => void;
   onFilesDrop: (event: DragEvent<HTMLElement>) => void;
-  onFilesInput: (event: ChangeEvent) => void;
+  onFilesInput: (event: ChangeEvent<HTMLInputElement>) => void;
   messages: DocumentMessages;
 };
 
@@ -126,7 +126,7 @@ export default function DocumentAttachmentsEditor({
             type="file"
             className="hidden"
             disabled={isDisabled}
-            onChange={(e) => onFilesInput(e)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => onFilesInput(e)}
             multiple
           />
         </label>

@@ -46,6 +46,7 @@ export default function Page({
     maxFileSize: t('max_file_size'),
     noDocumentsFound: t('no_documents_found'),
     search: t('search'),
+    actions: t('actions'),
     backToDocuments: t('back_to_documents'),
     updating: t('updating'),
     updatedDocument: t('updated_document'),

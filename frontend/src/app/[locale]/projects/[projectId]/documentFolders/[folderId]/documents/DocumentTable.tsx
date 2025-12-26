@@ -89,7 +89,7 @@ export default function DocumentTable({
             </Dropdown>
           );
         default:
-          return cellValue;
+          return typeof cellValue === 'string' || typeof cellValue === 'number' ? String(cellValue) : null;
       }
     },
     [projectId, locale, activeSearchFilter, messages, onDeleteDocument, isDisabled]

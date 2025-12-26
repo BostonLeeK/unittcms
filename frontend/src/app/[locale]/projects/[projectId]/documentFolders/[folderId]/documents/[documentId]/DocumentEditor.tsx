@@ -8,7 +8,8 @@ import { fetchDocument, updateDocument } from '@/utils/documentsControl';
 import { useRouter } from '@/src/i18n/routing';
 import { TokenContext } from '@/utils/TokenProvider';
 import { useFormGuard } from '@/utils/formGuard';
-import { DocumentType, AttachmentType, DocumentMessages } from '@/types/document';
+import { DocumentType, DocumentMessages } from '@/types/document';
+import { AttachmentType } from '@/types/case';
 import { logError } from '@/utils/errorHandler';
 
 const defaultDocument = {
@@ -96,7 +97,7 @@ export default function DocumentEditor({ projectId, folderId, documentId, messag
   };
 
   const formatText = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
+    window.document.execCommand(command, false, value);
     if (contentEditableRef.current) {
       contentEditableRef.current.focus();
     }
@@ -111,10 +112,10 @@ export default function DocumentEditor({ projectId, folderId, documentId, messag
     }
   };
 
-  const handleInput = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ? Array.from(event.target.files) : [];
     if (files.length > 0) {
-      await handleFiles(files);
+      handleFiles(files);
     }
   };
 
@@ -259,7 +260,7 @@ export default function DocumentEditor({ projectId, folderId, documentId, messag
             }
             onAttachmentDelete={onAttachmentDelete}
             onFilesDrop={handleDrop}
-            onFilesInput={handleInput}
+            onFilesInput={(event: ChangeEvent<Element>) => handleInput(event as ChangeEvent<HTMLInputElement>)}
             messages={messages}
           />
         )}
