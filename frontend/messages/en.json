@@ -430,6 +430,7 @@
     "max_file_size": "Max. file size",
     "no_documents_found": "No documents found",
     "search": "Search",
+    "actions": "Actions",
     "back_to_documents": "Back to Documents",
     "updating": "Updating...",
     "updated_document": "Document updated successfully"

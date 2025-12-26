@@ -430,6 +430,7 @@
     "max_file_size": "Макс. розмір файлу",
     "no_documents_found": "Документи не знайдені",
     "search": "Пошук",
+    "actions": "Дії",
     "back_to_documents": "Назад до документів",
     "updating": "Оновлення...",
     "updated_document": "Документ успішно оновлено"

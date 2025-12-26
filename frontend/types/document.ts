@@ -1,5 +1,7 @@
 import { AttachmentType } from './case';
 
+export type { AttachmentType };
+
 export type DocumentType = {
   id: number;
   title: string;
@@ -48,6 +50,10 @@ export type DocumentMessages = {
   maxFileSize: string;
   noDocumentsFound: string;
   search: string;
+  actions: string;
+  backToDocuments: string;
+  updating: string;
+  updatedDocument: string;
 };
 
 export type DocumentFolderMessages = {
