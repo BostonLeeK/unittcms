@@ -2,20 +2,20 @@ import { describe, expect, test } from 'vitest';
 import { isImage } from './isImage';
 import { AttachmentType } from '@/types/case';
 
+type CaseAttachmentType = {
+  createdAt: Date;
+  updatedAt: Date;
+  caseId: number;
+  attachmentId: number;
+};
+
 describe('attachment control', () => {
   test('isImage', () => {
-    type CaseAttachmentType = {
-      createdAt: Date;
-      updatedAt: Date;
-      CaseId: number;
-      AttachmentId: number;
-    };
-
     const sampleCaseAttachment: CaseAttachmentType = {
       createdAt: new Date(),
       updatedAt: new Date(),
-      CaseId: 1,
-      AttachmentId: 1,
+      caseId: 1,
+      attachmentId: 1,
     };
 
     const sampleAttachment: AttachmentType = {
