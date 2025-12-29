@@ -356,7 +356,8 @@
     "case_title_or_description": "Testfall-Titel oder Beschreibung",
     "selected": "Ausgewählt",
     "tags": "Tags",
-    "select_tags": "Tags auswählen"
+    "select_tags": "Tags auswählen",
+    "show_only_included_in_run": "Nur in Testlauf aufgenommene Testfälle anzeigen"
   },
   "Members": {
     "member_management": "Mitgliederverwaltung",

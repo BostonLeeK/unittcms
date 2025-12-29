@@ -89,6 +89,7 @@ type RunMessages = {
   selected: string;
   tags: string;
   selectTags: string;
+  showOnlyIncludedInRun: string;
 };
 
 export type { RunType, RunCaseType, RunStatusCountType, ProgressSeriesType, RunsMessages, RunMessages };

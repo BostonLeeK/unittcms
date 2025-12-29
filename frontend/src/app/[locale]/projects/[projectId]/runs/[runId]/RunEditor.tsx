@@ -110,6 +110,7 @@ export default function RunEditor({
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<number[]>([]);
   const [tagFilter, setTagFilter] = useState<number[]>([]);
+  const [showOnlyIncludedInRun, setShowOnlyIncludedInRun] = useState(false);
   const router = useRouter();
   useFormGuard(isDirty, messages.areYouSureLeave);
 
@@ -128,12 +129,16 @@ export default function RunEditor({
       status,
       tag
     );
-    casesData.forEach((testCase: CaseType) => {
-      if (testCase.RunCases && testCase.RunCases.length > 0) {
-        testCase.RunCases[0].editState = 'notChanged';
-      }
-    });
-    setTestCases(casesData);
+    if (casesData && Array.isArray(casesData)) {
+      casesData.forEach((testCase: CaseType) => {
+        if (testCase.RunCases && testCase.RunCases.length > 0) {
+          testCase.RunCases[0].editState = 'notChanged';
+        }
+      });
+      setTestCases(casesData);
+    } else {
+      setTestCases([]);
+    }
   };
 
   useEffect(() => {
@@ -158,11 +163,34 @@ export default function RunEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenContext]);
 
+  const getIncludedCasesCountForFolder = (folderId: string, allTestCases: CaseType[]): number => {
+    const folderIdNum = Number(folderId);
+    const casesInFolder = allTestCases.filter((testCase) => testCase.folderId === folderIdNum);
+    return casesInFolder.filter((testCase) => testCase.RunCases && testCase.RunCases.length > 0).length;
+  };
+
+  const getIncludedCasesCountRecursive = (node: TreeNodeData, allTestCases: CaseType[]): number => {
+    let count = getIncludedCasesCountForFolder(node.id, allTestCases);
+    if (node.children) {
+      node.children.forEach((child) => {
+        count += getIncludedCasesCountRecursive(child, allTestCases);
+      });
+    }
+    return count;
+  };
+
   useEffect(() => {
     function onFilter() {
       if (selectedFolder && selectedFolder.id) {
         try {
-          const filteredData = testCases.filter((testCase) => testCase.folderId.toString() === selectedFolder.id);
+          let filteredData = testCases.filter((testCase) => testCase.folderId.toString() === selectedFolder.id);
+
+          if (showOnlyIncludedInRun) {
+            filteredData = filteredData.filter((testCase) => {
+              return testCase.RunCases && testCase.RunCases.length > 0;
+            });
+          }
+
           setFilteredTestCases(filteredData);
         } catch (error: unknown) {
           logError('Error filtering test cases', error);
@@ -171,7 +199,7 @@ export default function RunEditor({
     }
 
     onFilter();
-  }, [selectedFolder, testCases]);
+  }, [selectedFolder, testCases, showOnlyIncludedInRun]);
 
   const handleChangeStatus = async (changeCaseId: number, newStatus: number) => {
     setIsDirty(true);
@@ -200,6 +228,10 @@ export default function RunEditor({
     setSelectedKeys(new Set([]));
   };
 
+  const handleShowOnlyIncludedInRunChange = (value: boolean) => {
+    setShowOnlyIncludedInRun(value);
+  };
+
   const onSave = async () => {
     setIsUpdating(true);
     await updateRun(tokenContext.token.access_token, testRun);
@@ -221,7 +253,7 @@ export default function RunEditor({
   const [showFilter, setShowFilter] = useState(false);
   const [activeFilterNum, setActiveFilterNum] = useState(0);
 
-  const onFilterChange = async (search: string, status: number[], tag: number[]) => {
+  const onFilterChange = async (search: string, status: number[], tag: number[], showOnlyIncludedInRun: boolean) => {
     if (isDirty) {
       addToast({
         title: 'Error',
@@ -231,10 +263,11 @@ export default function RunEditor({
       return;
     }
 
+    handleShowOnlyIncludedInRunChange(showOnlyIncludedInRun);
     setSearchFilter(search);
     setStatusFilter(status);
     setTagFilter(tag);
-    setActiveFilterNum((search ? 1 : 0) + (status.length > 0 ? 1 : 0) + (tag.length > 0 ? 1 : 0));
+    setActiveFilterNum((search ? 1 : 0) + (status.length > 0 ? 1 : 0) + (tag.length > 0 ? 1 : 0) + (showOnlyIncludedInRun ? 1 : 0));
     await initTestCases(search, status.map(String), tag.map(String));
   };
 
@@ -277,15 +310,16 @@ export default function RunEditor({
             </Badge>
             <PopoverContent>
               <TestRunFilter
+                activeShowOnlyIncludedInRun={showOnlyIncludedInRun}
                 messages={messages}
                 testRunCaseStatusMessages={testRunCaseStatusMessages}
                 activeSearchFilter={searchFilter}
                 activeStatusFilters={statusFilter}
                 activeTagFilters={tagFilter}
                 projectId={projectId}
-                onFilterChange={(newTitleFilter, newStatusFilters, newTagFilters) => {
+                onFilterChange={(newTitleFilter, newStatusFilters, newTagFilters, newShowOnlyIncludedInRun) => {
                   setShowFilter(false);
-                  onFilterChange(newTitleFilter, newStatusFilters, newTagFilters);
+                  onFilterChange(newTitleFilter, newStatusFilters, newTagFilters, newShowOnlyIncludedInRun);
                 }}
               />
             </PopoverContent>
@@ -470,34 +504,39 @@ export default function RunEditor({
               disableDrop={true}
               disableDrag={true}
             >
-              {({ node, style }: { node: NodeApi<TreeNodeData>; style: React.CSSProperties }) => (
-                <TreeItem
-                  style={style}
-                  isSelected={selectedFolder ? node.data.id === selectedFolder.id : false}
-                  onClick={() => {
-                    setSelectedKeys(new Set([]));
-                    setSelectedFolder(node.data);
-                  }}
-                  toggleButton={
-                    node.data.children && node.data.children.length > 0 ? (
-                      <Button
-                        size="sm"
-                        className="bg-transparent rounded-full h-6 w-6 min-w-4"
-                        isIconOnly
-                        onPress={() => node.toggle()}
-                      >
-                        {node.isOpen ? (
-                          <ChevronDown size={20} color="#F7C24E" />
-                        ) : (
-                          <ChevronRight size={20} color="#F7C24E" />
-                        )}
-                      </Button>
-                    ) : null
-                  }
-                  icon={<Folder size={20} color="#F7C24E" fill="#F7C24E" />}
-                  label={node.data.name}
-                />
-              )}
+              {({ node, style }: { node: NodeApi<TreeNodeData>; style: React.CSSProperties }) => {
+                const includedCount = getIncludedCasesCountRecursive(node.data, testCases);
+                const labelWithCount = includedCount > 0 ? `${node.data.name} (${includedCount})` : node.data.name;
+
+                return (
+                  <TreeItem
+                    style={style}
+                    isSelected={selectedFolder ? node.data.id === selectedFolder.id : false}
+                    onClick={() => {
+                      setSelectedKeys(new Set([]));
+                      setSelectedFolder(node.data);
+                    }}
+                    toggleButton={
+                      node.data.children && node.data.children.length > 0 ? (
+                        <Button
+                          size="sm"
+                          className="bg-transparent rounded-full h-6 w-6 min-w-4"
+                          isIconOnly
+                          onPress={() => node.toggle()}
+                        >
+                          {node.isOpen ? (
+                            <ChevronDown size={20} color="#F7C24E" />
+                          ) : (
+                            <ChevronRight size={20} color="#F7C24E" />
+                          )}
+                        </Button>
+                      ) : null
+                    }
+                    icon={<Folder size={20} color="#F7C24E" fill="#F7C24E" />}
+                    label={labelWithCount}
+                  />
+                );
+              }}
             </Tree>
           </div>
           <div className="w-9/12">

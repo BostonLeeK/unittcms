@@ -44,6 +44,7 @@ export default function Page({ params }: { params: { projectId: string; runId: s
     selected: t('selected'),
     tags: t('tags'),
     selectTags: t('select_tags'),
+    showOnlyIncludedInRun: t('show_only_included_in_run'),
   };
 
   const rst = useTranslations('RunStatus');

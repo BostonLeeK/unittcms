@@ -355,9 +355,10 @@ async function fetchProjectCases(
     }
 
     const data = await response.json();
-    return data;
+    return data || [];
   } catch (error: unknown) {
     logError('Error fetching data:', error);
+    return [];
   }
 }
 

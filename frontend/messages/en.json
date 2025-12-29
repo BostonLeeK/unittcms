@@ -355,7 +355,8 @@
     "case_title_or_description": "Test case title or description",
     "selected": "Selected",
     "tags": "Tags",
-    "select_tags": "Select tags"
+    "select_tags": "Select tags",
+    "show_only_included_in_run": "Show only included in run"
   },
   "Members": {
     "member_management": "Member Management",
