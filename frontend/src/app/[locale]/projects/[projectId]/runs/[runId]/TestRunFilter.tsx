@@ -8,6 +8,7 @@ import {
   Selection,
   Input,
   addToast,
+  Switch,
 } from '@heroui/react';
 import { SearchIcon, ChevronDown } from 'lucide-react';
 import RunCaseStatus from './RunCaseStatus';
@@ -26,7 +27,8 @@ type TestRunFilterProps = {
   activeSearchFilter: string;
   activeStatusFilters: number[];
   activeTagFilters: number[];
-  onFilterChange: (search: string, statusIndices: number[], tagIds: number[]) => void;
+  activeShowOnlyIncludedInRun: boolean;
+  onFilterChange: (search: string, statusIndices: number[], tagIds: number[], showOnlyIncludedInRun: boolean) => void;
 };
 
 type Tag = Pick<TagType, 'id' | 'name'>;
@@ -39,11 +41,13 @@ export default function TestRunFilter({
   activeSearchFilter = '',
   activeStatusFilters = [],
   activeTagFilters = [],
+  activeShowOnlyIncludedInRun = false,
 }: TestRunFilterProps) {
   const tokenContext = useContext(TokenContext);
   const [search, setSearch] = useState<string>('');
   const [selectedStatuses, setSelectedStatuses] = useState<Selection>(new Set([]));
   const [selectedTags, setSelectedTags] = useState<Selection>(new Set([]));
+  const [showOnlyIncludedInRun, setShowOnlyIncludedInRun] = useState(activeShowOnlyIncludedInRun);
   const [tags, setTags] = useState<Tag[]>([]);
 
   useEffect(() => {
@@ -81,6 +85,10 @@ export default function TestRunFilter({
     }
   }, [activeTagFilters]);
 
+  useEffect(() => {
+    setShowOnlyIncludedInRun(activeShowOnlyIncludedInRun);
+  }, [activeShowOnlyIncludedInRun]);
+
   const handleStatusSelectionChange = (keys: Selection) => {
     setSelectedStatuses(keys);
   };
@@ -100,14 +108,15 @@ export default function TestRunFilter({
         .filter((id) => !isNaN(id));
     }
 
-    onFilterChange(search, statusIndices, tagIds);
+    onFilterChange(search, statusIndices, tagIds, showOnlyIncludedInRun);
   };
 
   const handleClearFilter = () => {
     setSearch('');
     setSelectedStatuses(new Set([]));
     setSelectedTags(new Set([]));
-    onFilterChange('', [], []);
+    setShowOnlyIncludedInRun(false);
+    onFilterChange('', [], [], false);
   };
 
   return (
@@ -184,6 +193,12 @@ export default function TestRunFilter({
               ))}
             </DropdownMenu>
           </Dropdown>
+        </div>
+      </div>
+      <div className="mb-3 flex justify-between gap-2">
+        <div className="flex-col space-y-1">
+          <h3 className="text-default-500 text-small">{messages.showOnlyIncludedInRun}</h3>
+          <Switch isSelected={showOnlyIncludedInRun} onValueChange={setShowOnlyIncludedInRun} />
         </div>
       </div>
 

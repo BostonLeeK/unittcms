@@ -355,7 +355,8 @@
     "case_title_or_description": "Назва або опис тест-кейсу",
     "selected": "Вибрані",
     "tags": "Теги",
-    "select_tags": "Виберіть теги"
+    "select_tags": "Виберіть теги",
+    "show_only_included_in_run": "Показати тільки включені в запуск"
   },
   "Members": {
     "member_management": "Управління учасниками",
