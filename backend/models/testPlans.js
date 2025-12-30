@@ -30,3 +30,5 @@ function defineTestPlan(sequelize, DataTypes) {
 export default defineTestPlan;
 
 
+
+
