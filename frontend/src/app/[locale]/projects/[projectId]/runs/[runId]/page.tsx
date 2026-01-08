@@ -45,6 +45,8 @@ export default function Page({ params }: { params: { projectId: string; runId: s
     tags: t('tags'),
     selectTags: t('select_tags'),
     showOnlyIncludedInRun: t('show_only_included_in_run'),
+    comment: t('comment'),
+    addComment: t('add_comment'),
   };
 
   const rst = useTranslations('RunStatus');

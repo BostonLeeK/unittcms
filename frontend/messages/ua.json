@@ -356,7 +356,9 @@
     "selected": "Вибрані",
     "tags": "Теги",
     "select_tags": "Виберіть теги",
-    "show_only_included_in_run": "Показати тільки включені в запуск"
+    "show_only_included_in_run": "Показати тільки включені в запуск",
+    "comment": "Коментар",
+    "add_comment": "Додати коментар..."
   },
   "Members": {
     "member_management": "Управління учасниками",

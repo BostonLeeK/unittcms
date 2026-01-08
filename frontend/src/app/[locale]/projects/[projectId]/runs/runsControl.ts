@@ -186,7 +186,12 @@ async function fetchRunCases(jwt: string, runId: number) {
   }
 }
 
-function changeStatus(changeCaseId: number, newStatus: number, currentTestCases: CaseType[]): CaseType[] {
+function changeStatus(
+  changeCaseId: number,
+  newStatus: number,
+  currentTestCases: CaseType[],
+  comment?: string | null
+): CaseType[] {
   const updatedTestCases = [...currentTestCases];
 
   const found = updatedTestCases.find((testCase) => testCase.id === changeCaseId);
@@ -194,11 +199,20 @@ function changeStatus(changeCaseId: number, newStatus: number, currentTestCases:
     const runCase = found.RunCases[0];
     if (runCase.editState === 'notChanged') {
       runCase.status = newStatus;
+      if (comment !== undefined) {
+        runCase.comment = comment;
+      }
       runCase.editState = 'changed';
     } else if (runCase.editState === 'changed') {
       runCase.status = newStatus;
+      if (comment !== undefined) {
+        runCase.comment = comment;
+      }
     } else if (runCase.editState === 'new') {
       runCase.status = newStatus;
+      if (comment !== undefined) {
+        runCase.comment = comment;
+      }
     } else if (runCase.editState === 'deleted') {
       // do nothing
     }
@@ -286,6 +300,7 @@ async function updateRunCases(jwt: string, runId: number, testCases: CaseType[])
         caseId: itr.id,
         runId: runId,
         status: itr.RunCases[0].status,
+        comment: itr.RunCases[0].comment,
         editState: itr.RunCases[0].editState,
         createdAt: '0',
         updatedAt: '0',

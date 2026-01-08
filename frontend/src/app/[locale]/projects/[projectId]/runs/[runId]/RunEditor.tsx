@@ -201,9 +201,9 @@ export default function RunEditor({
     onFilter();
   }, [selectedFolder, testCases, showOnlyIncludedInRun]);
 
-  const handleChangeStatus = async (changeCaseId: number, newStatus: number) => {
+  const handleChangeStatus = async (changeCaseId: number, newStatus: number, comment?: string | null) => {
     setIsDirty(true);
-    const newTestCases = changeStatus(changeCaseId, newStatus, testCases);
+    const newTestCases = changeStatus(changeCaseId, newStatus, testCases, comment);
     setTestCases(newTestCases);
   };
 
