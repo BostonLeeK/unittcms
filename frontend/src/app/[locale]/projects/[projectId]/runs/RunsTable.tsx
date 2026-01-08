@@ -13,11 +13,13 @@ import {
   DropdownItem,
   SortDescriptor,
 } from '@heroui/react';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Check } from 'lucide-react';
 import dayjs from 'dayjs';
 import { Link, NextUiLinkClasses } from '@/src/i18n/routing';
 import { RunsMessages, RunType } from '@/types/run';
 import { LocaleCodeType } from '@/types/locale';
+import { testRunStatus } from '@/config/selection';
+import { RunStatusMessages } from '@/types/status';
 
 type Props = {
   projectId: string;
@@ -26,9 +28,18 @@ type Props = {
   onDeleteRun: (runId: number) => void;
   messages: RunsMessages;
   locale: LocaleCodeType;
+  runStatusMessages: RunStatusMessages;
 };
 
-export default function RunsTable({ projectId, isDisabled, runs, onDeleteRun, messages, locale }: Props) {
+export default function RunsTable({
+  projectId,
+  isDisabled,
+  runs,
+  onDeleteRun,
+  messages,
+  locale,
+  runStatusMessages,
+}: Props) {
   const [disabledKeys, setDisabledKeys] = useState<string[]>([]);
   useEffect(() => {
     if (isDisabled) {
@@ -41,6 +52,7 @@ export default function RunsTable({ projectId, isDisabled, runs, onDeleteRun, me
   const headerColumns = [
     { name: messages.id, uid: 'id', sortable: true },
     { name: messages.name, uid: 'name', sortable: true },
+    { name: messages.status, uid: 'state', sortable: true },
     { name: messages.lastUpdate, uid: 'updatedAt', sortable: true },
     { name: messages.actions, uid: 'actions' },
   ];
@@ -73,16 +85,28 @@ export default function RunsTable({ projectId, isDisabled, runs, onDeleteRun, me
       case 'name': {
         const maxLength = 30;
         const truncatedDescription = truncateText(run.description, maxLength);
+        const runStatus = testRunStatus[run.state];
+        const isCompleted = runStatus?.uid === 'done' || runStatus?.uid === 'closed';
         return (
-          <div>
-            <Link href={`/projects/${projectId}/runs/${run.id}`} locale={locale} className={NextUiLinkClasses}>
-              {cellValue as string}
-            </Link>
-            <div className="text-xs text-default-500">
-              <div>{truncatedDescription}</div>
+          <div className="flex items-center gap-2">
+            {isCompleted && (
+              <Check size={16} className="text-success flex-shrink-0" />
+            )}
+            <div className="flex-1 min-w-0">
+              <Link href={`/projects/${projectId}/runs/${run.id}`} locale={locale} className={NextUiLinkClasses}>
+                {cellValue as string}
+              </Link>
+              <div className="text-xs text-default-500">
+                <div>{truncatedDescription}</div>
+              </div>
             </div>
           </div>
         );
+      }
+      case 'state': {
+        const runStatus = testRunStatus[run.state];
+        const statusText = runStatus ? runStatusMessages[runStatus.uid] : '';
+        return <span>{statusText}</span>;
       }
       case 'updatedAt':
         return <span>{dayjs(cellValue as string).format('YYYY/MM/DD HH:mm')}</span>;

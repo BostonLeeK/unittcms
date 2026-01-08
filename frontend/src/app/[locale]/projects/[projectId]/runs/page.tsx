@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { useTranslations } from 'next-intl';
 import RunsPage from './RunsPage';
 import { LocaleCodeType } from '@/types/locale';
+import { RunStatusMessages } from '@/types/status';
 
 export async function generateMetadata({ params: { locale } }: { params: { locale: LocaleCodeType } }) {
   const t = await getTranslations({ locale, namespace: 'Runs' });
@@ -23,6 +24,7 @@ export default function Page({ params }: { params: { projectId: string; locale: 
     name: t('name'),
     description: t('description'),
     lastUpdate: t('last_update'),
+    status: t('status'),
     actions: t('actions'),
     runName: t('run_name'),
     runDescription: t('run_description'),
@@ -35,9 +37,24 @@ export default function Page({ params }: { params: { projectId: string; locale: 
     delete: t('delete'),
   };
 
+  const rst = useTranslations('RunStatus');
+  const runStatusMessages: RunStatusMessages = {
+    new: rst('new'),
+    inProgress: rst('inProgress'),
+    underReview: rst('underReview'),
+    rejected: rst('rejected'),
+    done: rst('done'),
+    closed: rst('closed'),
+  };
+
   return (
     <>
-      <RunsPage projectId={params.projectId} locale={params.locale as LocaleCodeType} messages={messages} />
+      <RunsPage
+        projectId={params.projectId}
+        locale={params.locale as LocaleCodeType}
+        messages={messages}
+        runStatusMessages={runStatusMessages}
+      />
     </>
   );
 }
