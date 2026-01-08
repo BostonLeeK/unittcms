@@ -25,6 +25,7 @@ vi.mock('../../middleware/verifyVisible.js', () => ({
 const mockCase = {
   findAll: vi.fn(),
   belongsToMany: vi.fn(),
+  belongsTo: vi.fn(),
 };
 
 vi.mock('../../models/cases.js', () => ({
@@ -38,6 +39,13 @@ vi.mock('../../models/tags.js', () => ({
   default: () => mockTags,
 }));
 
+const mockFolder = {
+  findAll: vi.fn(),
+};
+vi.mock('../../models/folders.js', () => ({
+  default: () => mockFolder,
+}));
+
 describe('GET /cases', () => {
   let app;
   const sequelize = new Sequelize({
@@ -46,6 +54,8 @@ describe('GET /cases', () => {
   });
 
   beforeEach(() => {
+    vi.clearAllMocks();
+    mockFolder.findAll.mockResolvedValue([]);
     app = express();
     app.use(express.json());
 
@@ -64,12 +74,17 @@ describe('GET /cases', () => {
     const res = await request(app).get('/cases?folderId=1');
     expect(res.status).toBe(200);
     expect(mockCase.findAll).toHaveBeenCalledWith({
-      where: { folderId: '1' },
+      where: { folderId: { [Op.in]: [1] } },
       include: [
         {
           model: mockTags,
           attributes: ['id', 'name'],
           through: { attributes: [] },
+        },
+        {
+          model: mockFolder,
+          attributes: ['id', 'name'],
+          required: false,
         },
       ],
     });
@@ -83,7 +98,7 @@ describe('GET /cases', () => {
 
     expect(mockCase.findAll).toHaveBeenCalledWith({
       where: {
-        folderId: '1',
+        folderId: { [Op.in]: [1] },
         priority: { [Op.in]: [1, 2] },
         type: { [Op.in]: [3] },
       },
@@ -92,6 +107,11 @@ describe('GET /cases', () => {
           model: mockTags,
           attributes: ['id', 'name'],
           through: { attributes: [] },
+        },
+        {
+          model: mockFolder,
+          attributes: ['id', 'name'],
+          required: false,
         },
       ],
     });

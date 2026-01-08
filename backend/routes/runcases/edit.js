@@ -21,6 +21,7 @@ export default function (sequelize) {
           runId: runId,
           caseId: runCase.caseId,
           status: runCase.status,
+          comment: runCase.comment || null,
         },
         { transaction: t }
       );
@@ -39,6 +40,7 @@ export default function (sequelize) {
       await RunCase.update(
         {
           status: runCase.status,
+          comment: runCase.comment !== undefined ? runCase.comment : null,
         },
         {
           where: { id: runCase.id },

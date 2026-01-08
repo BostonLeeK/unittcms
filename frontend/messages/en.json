@@ -356,7 +356,9 @@
     "selected": "Selected",
     "tags": "Tags",
     "select_tags": "Select tags",
-    "show_only_included_in_run": "Show only included in run"
+    "show_only_included_in_run": "Show only included in run",
+    "comment": "Comment",
+    "add_comment": "Add a comment..."
   },
   "Members": {
     "member_management": "Member Management",

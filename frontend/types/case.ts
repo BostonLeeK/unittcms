@@ -1,3 +1,5 @@
+import { RunCaseType } from './run';
+
 type CaseType = {
   id: number;
   title: string;
@@ -39,14 +41,6 @@ type StepType = {
   updatedAt: Date;
   caseSteps: CaseStepType;
   uid: string;
-  editState: 'notChanged' | 'changed' | 'new' | 'deleted';
-};
-
-type RunCaseType = {
-  id: number;
-  runId: number;
-  caseId: number;
-  status: number;
   editState: 'notChanged' | 'changed' | 'new' | 'deleted';
 };
 

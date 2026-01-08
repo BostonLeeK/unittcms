@@ -109,7 +109,7 @@ export default function (sequelize) {
             },
             {
               model: RunCase,
-              attributes: ['id', 'runId', 'status'],
+              attributes: ['id', 'runId', 'status', 'comment'],
               // Must be 'true' when filtering by status, otherwise all cases are returned.
               required: runCaseRequired,
               where: {

@@ -13,8 +13,16 @@ import {
   DropdownItem,
   Selection,
   SortDescriptor,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+  Select,
+  SelectItem,
 } from '@heroui/react';
-import { ChevronDown, MoveDiagonal, MoreVertical, CopyPlus, CopyMinus } from 'lucide-react';
+import { ChevronDown, MoveDiagonal, MoreVertical, CopyPlus, CopyMinus, MessageSquare } from 'lucide-react';
 import TestCaseDetailDialog from './TestCaseDetailDialog';
 import RunCaseStatus from './RunCaseStatus';
 import { testRunCaseStatus } from '@/config/selection';
@@ -30,7 +38,7 @@ type Props = {
   isDisabled: boolean;
   selectedKeys: Selection;
   onSelectionChange: React.Dispatch<React.SetStateAction<Selection>>;
-  onChangeStatus: (changeCaseId: number, status: number) => void;
+  onChangeStatus: (changeCaseId: number, status: number, comment?: string | null) => void;
   onIncludeCase: (includeCaseId: number) => void;
   onExcludeCase: (excludeCaseId: number) => void;
   messages: RunMessages;
@@ -130,33 +138,75 @@ export default function TestCaseSelector({
           </div>
         );
       case 'runStatus':
-        return (
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                size="sm"
-                variant="light"
-                isDisabled={!isIncluded}
-                startContent={isIncluded && <RunCaseStatus uid={testRunCaseStatus[runStatus].uid} />}
-                endContent={isIncluded && <ChevronDown size={16} />}
+        const hasComment = isIncluded && testCase.RunCases?.[0]?.comment;
+        const dropdownItems = [
+          ...testRunCaseStatus.map((runCaseStatus, index) => (
+            <DropdownItem
+              key={runCaseStatus.uid}
+              startContent={<RunCaseStatus uid={runCaseStatus.uid} />}
+              onPress={() => {
+                onChangeStatus(testCase.id, index);
+                if (testCase.RunCases?.[0]?.comment) {
+                  setEditingStatusCaseId(testCase.id);
+                  setEditingStatusIndex(index);
+                  setEditingComment(testCase.RunCases[0].comment);
+                  setIsStatusModalOpen(true);
+                }
+              }}
+            >
+              {testRunCaseStatusMessages[runCaseStatus.uid]}
+            </DropdownItem>
+          )),
+          ...(isIncluded
+            ? [
+              <DropdownItem
+                key="edit-comment"
+                onPress={() => {
+                  setEditingStatusCaseId(testCase.id);
+                  setEditingStatusIndex(runStatus);
+                  setEditingComment(testCase.RunCases?.[0]?.comment || '');
+                  setIsStatusModalOpen(true);
+                }}
               >
-                <span className="w-12">
-                  {isIncluded && testRunCaseStatusMessages[testRunCaseStatus[runStatus].uid]}
-                </span>
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu disabledKeys={disabledStatusKeys} aria-label="test case actions">
-              {testRunCaseStatus.map((runCaseStatus, index) => (
-                <DropdownItem
-                  key={runCaseStatus.uid}
-                  startContent={<RunCaseStatus uid={runCaseStatus.uid} />}
-                  onPress={() => onChangeStatus(testCase.id, index)}
+                {hasComment ? messages.comment : messages.addComment}
+              </DropdownItem>,
+            ]
+            : []),
+        ];
+        return (
+          <div className="flex items-center gap-2">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  size="sm"
+                  variant="light"
+                  isDisabled={!isIncluded}
+                  startContent={isIncluded && <RunCaseStatus uid={testRunCaseStatus[runStatus].uid} />}
+                  endContent={isIncluded && <ChevronDown size={16} />}
                 >
-                  {testRunCaseStatusMessages[runCaseStatus.uid]}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
+                  <span className="w-12">
+                    {isIncluded && testRunCaseStatusMessages[testRunCaseStatus[runStatus].uid]}
+                  </span>
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu disabledKeys={disabledStatusKeys} aria-label="test case actions">
+                {dropdownItems}
+              </DropdownMenu>
+            </Dropdown>
+            {hasComment && (
+              <MessageSquare
+                size={14}
+                className="text-default-400 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingStatusCaseId(testCase.id);
+                  setEditingStatusIndex(runStatus);
+                  setEditingComment(testCase.RunCases?.[0]?.comment || '');
+                  setIsStatusModalOpen(true);
+                }}
+              />
+            )}
+          </div>
         );
       case 'actions':
         return (
@@ -233,6 +283,26 @@ export default function TestCaseSelector({
     setIsTestCaseDetailDialogOpen(false);
   };
 
+  // Status and Comment Modal
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [editingStatusCaseId, setEditingStatusCaseId] = useState<number | null>(null);
+  const [editingStatusIndex, setEditingStatusIndex] = useState<number>(0);
+  const [editingComment, setEditingComment] = useState<string>('');
+
+  const handleStatusModalClose = () => {
+    setIsStatusModalOpen(false);
+    setEditingStatusCaseId(null);
+    setEditingStatusIndex(0);
+    setEditingComment('');
+  };
+
+  const handleStatusModalSave = () => {
+    if (editingStatusCaseId !== null) {
+      onChangeStatus(editingStatusCaseId, editingStatusIndex, editingComment || null);
+    }
+    handleStatusModalClose();
+  };
+
   return (
     <>
       <Table
@@ -276,6 +346,29 @@ export default function TestCaseSelector({
         priorityMessages={priorityMessages}
         testTypeMessages={testTypeMessages}
       />
+
+      <Modal isOpen={isStatusModalOpen} onClose={handleStatusModalClose} size="lg">
+        <ModalContent>
+          <ModalHeader>{messages.comment}</ModalHeader>
+          <ModalBody>
+            <Textarea
+              label={messages.comment}
+              placeholder={messages.addComment}
+              value={editingComment}
+              onValueChange={setEditingComment}
+              minRows={3}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={handleStatusModalClose}>
+              {messages.close}
+            </Button>
+            <Button color="primary" onPress={handleStatusModalSave}>
+              {messages.update}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

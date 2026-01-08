@@ -12,6 +12,10 @@ function defineRunCase(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    comment: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   });
 
   RunCase.associate = (models) => {

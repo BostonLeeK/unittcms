@@ -15,6 +15,7 @@ type RunCaseType = {
   runId: number;
   caseId: number;
   status: number;
+  comment?: string | null;
   editState: 'notChanged' | 'changed' | 'new' | 'deleted';
   createdAt: string;
   updatedAt: string;
@@ -90,6 +91,8 @@ type RunMessages = {
   tags: string;
   selectTags: string;
   showOnlyIncludedInRun: string;
+  comment: string;
+  addComment: string;
 };
 
 export type { RunType, RunCaseType, RunStatusCountType, ProgressSeriesType, RunsMessages, RunMessages };
