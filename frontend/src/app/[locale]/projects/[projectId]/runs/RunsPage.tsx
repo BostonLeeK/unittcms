@@ -10,11 +10,13 @@ import DeleteConfirmDialog from '@/components/DeleteConfirmDialog';
 import { TokenContext } from '@/utils/TokenProvider';
 import { LocaleCodeType } from '@/types/locale';
 import { logError } from '@/utils/errorHandler';
+import { RunStatusMessages } from '@/types/status';
 
 type Props = {
   projectId: string;
   locale: LocaleCodeType;
   messages: RunsMessages;
+  runStatusMessages: RunStatusMessages;
 };
 
 const defaultRun = {
@@ -28,7 +30,7 @@ const defaultRun = {
   updatedAt: '',
 };
 
-export default function RunsPage({ projectId, locale, messages }: Props) {
+export default function RunsPage({ projectId, locale, messages, runStatusMessages }: Props) {
   const context = useContext(TokenContext);
   const [runs, setRuns] = useState<RunType[]>([]);
 
@@ -119,6 +121,7 @@ export default function RunsPage({ projectId, locale, messages }: Props) {
         onDeleteRun={onDeleteClick}
         messages={messages}
         locale={locale}
+        runStatusMessages={runStatusMessages}
       />
 
       <RunDialog

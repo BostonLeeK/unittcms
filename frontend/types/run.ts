@@ -41,6 +41,7 @@ type RunsMessages = {
   name: string;
   description: string;
   lastUpdate: string;
+  status: string;
   actions: string;
   runName: string;
   runDescription: string;
